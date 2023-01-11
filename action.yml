@@ -1,0 +1,61 @@
+name: 'Push to Vercel'
+description: 'Push prebuilt static files to Vercel.'
+
+inputs:
+  vercel-token:
+    description: 'Your vercel access token.'
+    required: true
+  vercel-projectId:
+    description: 'Your vercel projectId. Obtained from project.json.'
+    required: true
+  vercel-orgId:
+    description: 'Your vercel orgId. Obtained from project.json.'
+    required: true
+  production:
+    description: 'Whether to add --prod flag to deploy command.'
+    required: true
+    default: true
+  dir:
+    description: 'Which directory to deploy.'
+    required: true
+    default: 'public'
+  vercel-region:
+    description: 'Vercel Edge Network Region to deploy to.'
+    required: false
+    default: ''
+
+outputs:
+  deployment-url:
+    description: "Vercel Deployment URL"
+    value: ${{ steps.vercel-deploy.outputs.deployment-url }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Use Node.js 18.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: "18"
+      
+    - name: Install vercel-cli
+      shell: bash
+      run: npm install -g vercel
+      
+    - name: Move directory
+      shell: bash
+      run: |
+        mkdir -p .vercel/output
+        mv ${{ inputs.dir }} .vercel/output/static
+
+    - name: Create vercel metadata files
+      shell: bash
+      run: |
+        echo '{"version": 3}' > .vercel/output/config.json
+        echo '{"projectId":"${{ inputs.vercel-projectId }}","orgId":"${{ inputs.vercel-orgId }}"}' > .vercel/project.json
+
+    - name: Deploy
+      id: vercel-deploy
+      shell: bash
+      run: |
+        vercel deploy --prebuilt ${{ inputs.production && '--prod' || '' }} --token ${{ inputs.vercel-token }} ${{ inputs.vercel-region && inputs.vercel-region || '' }}> url.txt
+        echo "deployment-url=$(cat url.txt)" >> $GITHUB_OUTPUT
