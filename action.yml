@@ -57,5 +57,5 @@ runs:
       id: vercel-deploy
       shell: bash
       run: |
-        vercel deploy --prebuilt ${{ inputs.production && '--prod' || '' }} --token ${{ inputs.vercel-token }} ${{ inputs.vercel-region && format('--region {0}', inputs.vercel-region) || '' }}> url.txt
+        vercel deploy --prebuilt ${{ inputs.production && '--prod' || '' }} --token ${{ inputs.vercel-token }} ${{ inputs.vercel-region && format('--regions {0}', inputs.vercel-region) || '' }}> url.txt
         echo "deployment-url=$(cat url.txt)" >> $GITHUB_OUTPUT
