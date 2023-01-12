@@ -50,7 +50,6 @@ runs:
     - name: Create vercel metadata files
       shell: bash
       run: |
-        # echo '{"version": 3}' > .vercel/output/config.json
         cat > .vercel/output/config.json << EOF
         { "version": 3,
           "routes": [
@@ -69,5 +68,5 @@ runs:
       id: vercel-deploy
       shell: bash
       run: |
-        vercel deploy --prebuilt ${{ inputs.production && '--prod' || '' }} --token ${{ inputs.vercel-token }} ${{ inputs.vercel-region && format('--regions {0}', inputs.vercel-region) || '' }}> url.txt
+        vercel deploy --prebuilt ${{ inputs.production == true && '--prod' || '' }} --token ${{ inputs.vercel-token }} ${{ inputs.vercel-region && format('--regions {0}', inputs.vercel-region) || '' }} > url.txt
         echo "deployment-url=$(cat url.txt)" >> $GITHUB_OUTPUT
