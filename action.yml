@@ -14,7 +14,7 @@ inputs:
   production:
     description: 'Whether to add --prod flag to deploy command.'
     required: true
-    default: true
+    default: 'false'
   dir:
     description: 'Which directory to deploy.'
     required: true
@@ -68,5 +68,5 @@ runs:
       id: vercel-deploy
       shell: bash
       run: |
-        vercel deploy --prebuilt ${{ inputs.production == true && '--prod' || '' }} --token ${{ inputs.vercel-token }} ${{ inputs.vercel-region && format('--regions {0}', inputs.vercel-region) || '' }} > url.txt
+        vercel deploy --prebuilt ${{ inputs.production == 'true' && '--prod' || '' }} --token ${{ inputs.vercel-token }} ${{ inputs.vercel-region && format('--regions {0}', inputs.vercel-region) || '' }} > url.txt
         echo "deployment-url=$(cat url.txt)" >> $GITHUB_OUTPUT
